@@ -1,0 +1,312 @@
+from tkinter import *
+
+import time
+
+import random
+
+
+class Menu:
+
+    def __init__(self):
+        self.__mainwindow = Tk()
+        self.__mainwindow.title("Reaction test")
+
+        # Creating an object for the game, but it is not yet created
+        self.__gameUI = None
+
+        # Creating the mainwindow attributes
+        self.__startbutton = Button(self.__mainwindow, text="Start", command=self.start_game,
+                                    width=10, height=5, font=("Calibri", 15))
+        self.__quitbutton = Button(self.__mainwindow, text="Quit", command=self.quit_game,
+                                   width=10, height=5, font=("Calibri", 15))
+        self.__menulabel = Label(self.__mainwindow, text="MENU", padx=10, pady=2,
+                                 foreground="blue", font=("Calibri light", 25, "bold"))
+
+        self.__menulabel.grid(row=0, column=1, columnspan=2)
+        self.__startbutton.grid(row=2, column=0, columnspan=2)
+        self.__quitbutton.grid(row=2, column=2, columnspan=2)
+
+    def quit_game(self):
+        """Quits the game."""
+        self.__mainwindow.destroy()
+        return False
+
+    def start(self):
+        """ Starts the mainloop. """
+        self.__mainwindow.mainloop()
+
+    def start_game(self):
+        """The game begins"""
+        self.__mainwindow.destroy()
+        self.__gameUI = Game()
+        self.__gameUI.start()
+
+
+class Game:
+    def __init__(self):
+        self.__mainwindow = Tk()
+        self.__mainwindow.title("Game")
+
+        # Creating the quit and start button and some other labels
+        self.__2quitbutton = Button(self.__mainwindow, text="Quit",
+                                    command=self.quit_2, width=9, height=2)
+
+        self.__game_start = Button(self.__mainwindow, text="Start",
+                                   command=self.game_start, width=9, height=2)
+
+        # Creating the timer labels
+        self.__timerlabel = Label(self.__mainwindow, text="Timer:")
+        self.__timer_seconds = Label(self.__mainwindow, text="seconds")
+
+        # Now score labels
+        self.__score = Label(self.__mainwindow, text="0")
+        self.__score_lbl = Label(self.__mainwindow, text="Current score:")
+
+        # Creating the timer
+        self.__counter = 0
+        self.__t = StringVar()
+        self.__timer = Label(self.__mainwindow, textvariable=self.__t)
+        self.__t.set("30")
+
+        self.__message = Label(self.__mainwindow, text="")
+
+        # Making a list for all the randomized numbers so you don't get the same button twice in a row
+        self.__rand_nums = []
+
+        # Creating buttons
+        self.__button1 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check1, bg="white")
+        self.__button2 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check2, bg="white")
+        self.__button3 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check3, bg="white")
+        self.__button4 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check4, bg="white")
+        self.__button5 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check5, bg="white")
+        self.__button6 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check6, bg="white")
+        self.__button7 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check7, bg="white")
+        self.__button8 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check8, bg="white")
+        self.__button9 = Button(self.__mainwindow, width=9, height=3,
+                                command=self.check9, bg="white")
+
+        # Let's store the buttons in a list
+        button_list = [self.__button1, self.__button2, self.__button3,
+                       self.__button4, self.__button5, self.__button6,
+                       self.__button7, self.__button8, self.__button9]
+
+        self.__buttons = button_list
+
+        # Placing the buttons
+        for button in button_list:
+            if button_list.index(button) < 3:
+                x = button_list.index(button)
+                y = 2
+            if 3 <= button_list.index(button) < 6:
+                x = button_list.index(button) - 3
+                y = 3
+            if button_list.index(button) >= 6:
+                x = button_list.index(button) - 6
+                y = 4
+
+            button.grid(row=y, column=x)
+
+        # Placing rest of the objects
+        self.__2quitbutton.grid(row=6, column=1, columnspan=2)
+        self.__timerlabel.grid(row=0, column=0, stick=E)
+        self.__timer.grid(row=0, column=1)
+        self.__timer_seconds.grid(row=0, column=2, stick=W)
+        self.__game_start.grid(row=6, column=0, columnspan=2)
+        self.__score.grid(row=1, column=1)
+        self.__score_lbl.grid(row=1, column=0)
+        self.__message.grid(row=5, column=0, columnspan=3)
+
+    def timer(self):
+
+        while self.__counter > -1:
+            self.__t.set(str(self.__counter))
+            self.__mainwindow.update()
+            self.__counter -= 1
+            time.sleep(1)
+            if self.__counter == 0:
+                self.end_of_game()
+
+    def game_start(self):
+
+        self.__message.configure(text="")
+        self.__score.configure(text="0")
+
+        if self.__t != "30":
+            self.__counter = 30
+            self.__t.set("30")
+            self.__mainwindow.update()
+
+            for button in self.__buttons:
+                button["bg"] = "white"
+
+        self.change_colour()
+        self.timer()
+
+
+    def end_of_game(self):
+
+        if int(self.__score["text"]) >= 30:
+            self.__message.configure(text="Congratulations! You are a cheetah!")
+        elif 23 <= int(self.__score["text"]) < 30:
+            self.__message.configure(text="Congratulations! You are a tiger!")
+        elif 15 <= int(self.__score["text"]) < 23:
+            self.__message.configure(text="You are bit slow. You are a dog! :)")
+        elif 5 <= int(self.__score["text"]) < 15:
+            self.__message.configure(text="You are extremely slow. You are a turtle. :/")
+        elif 0 <= int(self.__score["text"]) < 5:
+            self.__message.configure(text="Are you even human? You are a snail...")
+
+    def start(self):
+        self.__mainwindow.mainloop()
+
+    def quit_2(self):
+        self.__mainwindow.destroy()
+
+    def change_colour(self):
+
+        while True:
+            random_number = random.randint(0, 8)
+            if len(self.__rand_nums) == 0:
+                self.__rand_nums.append(random_number)
+                self.__buttons[random_number].configure(bg="red")
+                break
+
+            elif random_number != self.__rand_nums[-1]:
+                self.__rand_nums.append(random_number)
+                self.__buttons[random_number].configure(bg="red")
+                break
+
+    def check1(self):
+        if self.__button1.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button1.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check2(self):
+        if self.__button2.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button2.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check3(self):
+        if self.__button3.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button3.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check4(self):
+        if self.__button4.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button4.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check5(self):
+        if self.__button5.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button5.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check6(self):
+        if self.__button6.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button6.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check7(self):
+        if self.__button7.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button7.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check8(self):
+        if self.__button8.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button8.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+    def check9(self):
+        if self.__button9.cget("bg") == "red":
+            current_score = int(self.__score.cget("text"))
+            current_score += 1
+            new_score = str(current_score)
+            self.__score.configure(text=new_score)
+            self.__button9.configure(bg="white")
+
+            if self.__counter > 0:
+                self.change_colour()
+        else:
+            pass
+
+
+def main():
+
+    ui = Menu()
+    ui.start()
+
+
+if __name__ == "__main__":
+    main()
